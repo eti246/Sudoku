@@ -1,0 +1,84 @@
+﻿@using SudokuSolverBlazor.Data;
+@inject IJSRuntime JsRuntime;
+<div id="mainalign">
+
+    <h1>Sudoku</h1>
+
+    <hr>
+    <h2 id="errors">0</h2>
+
+
+    <!-- 9 by 9 board -->
+    <div id="board">
+        @for (int r = 0; r < 9; r++)
+        {
+            @for (int c = 0; c < 9; c++)
+            {
+                string temp = r.ToString() + "-"+c.ToString();
+                <div id="@r-@c" class="tile@(returnClass(r,c))" @onclick="(e) => {selectTile(temp);}">@(board[r][c] == '-' ? "" : board[r][c]) </div>
+            }
+        }
+    </div>
+    <br>
+    <div id="digits">
+        @for (int i = 1; i <= 9; i++)
+        {
+            int temp = i;
+            <div id="@i" class="number" @onclick="(e) => {selectNumber(temp.ToString());}">@i</div>
+        }
+    </div>
+     <div>
+        <button class="btn-primary" @onclick="showSolution">See Solution</button>
+        <button class="btn-primary" @onclick="reset">Generate a new One</button>
+    </div>
+</div>
+
+@code {
+  
+    static List<string> solution;
+    static List<string> board;
+    void selectNumber(string id)
+    {
+        JsRuntime.InvokeVoidAsync("selectNumber", id);
+    }
+
+    void selectTile(string id)
+    {
+        JsRuntime.InvokeVoidAsync("selectTile", id, solution);
+    }
+    string returnClass(int row, int col)
+    {
+        string Value = "";
+        if(board[row][col] !='-')
+        {
+            Value += " title-start";
+        }
+
+        if(row == 2 || row == 5)
+        {
+            Value += " rowBorder";
+        }
+        if(col ==2 || col ==5)
+        {
+            Value += " colBorder";
+        }
+        return Value;
+    }
+    protected override void OnInitialized()
+    {
+        solution = Sudoku_Generator.Generate();
+        board = Sudoku_Generator.board;
+
+    }
+    private void showSolution()
+    {
+        board = solution;
+    }
+
+    private async Task reset()
+    {
+        solution = Sudoku_Generator.Generate();
+        board = Sudoku_Generator.board;
+        await JsRuntime.InvokeVoidAsync("resetError");
+    }
+}
