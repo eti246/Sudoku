@@ -133,3 +133,9 @@ hr{
 .colBorder {
     border-right: 1px solid black;
 }
+.btn {
+    border: solid 1px;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
